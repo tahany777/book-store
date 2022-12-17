@@ -116,3 +116,83 @@ False
 <QuerySet [<Book: Harry Potter 1 - The Philosopher's Stone(5)>]>
 
 ```
+
+## Author and Book model (one to many relationship)
+
+```shell
+>>> from book_outlet.models import Book, Author
+>>> jkrowling = Author(first_name="J.K.", last_name="Rowling")
+>>> jkrowling.save()
+>>> Author.objects.all()
+<QuerySet [<Author: Author object (1)>]>
+>>> Author.objects.all()[0].first_name
+'J.K.'
+
+>>> hp1 = Book(title="Harry Potter 1", rating=5, is_bestselling=True, slug="harry-potter-1", author=jkrowling)
+>>> hp1.save()
+>>> Book.objects.all()
+<QuerySet [<Book: Harry Potter 1(5)>]>
+
+>>> harrypotter = Book.objects.get(title="Harry Potter 1")
+>>> harrypotter
+<Book: Harry Potter 1(5)>
+>>> harrypotter.author.last_name
+'Rowling'
+
+>>> books_by_rowling = Book.objects.filter(author__last_name="Rowling")
+>>> books_by_rowling
+<QuerySet [<Book: Harry Potter 1(5)>]>
+
+>>> books_by_rowling = Book.objects.filter(author__last_name__contains="wling")
+>>> books_by_rowling
+<QuerySet [<Book: Harry Potter 1(5)>]>
+
+>>> jkr = Author.objects.get(first_name="J.K.")
+>>> jkr
+<Author: Author object (1)>
+>>> jkr.book_set
+<django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager.<locals>.RelatedManager object at 0x7f25a0eab1c0>
+>>> jkr.book_set.all()
+<QuerySet [<Book: Harry Potter 1(5)>]>
+
+## After add related name = books in Book model author
+>>> from book_outlet.models import Book, Author
+>>> jkr = Author.objects.get(first_name="J.K.")
+>>> jkr.books.all()
+<QuerySet [<Book: Harry Potter 1(5)>]>
+```
+
+## Author and Address models (one to one relationship)
+
+```shell
+
+>>> from book_outlet.models import Book, Author, Address
+>>> Author.objects.all()[0].address
+>>> addr1 = Address(street="Some Street", postal_code="12345", city="London")
+>>> addr2 = Address(street="Another Street", postal_code="67890", city="New York")
+>>> addr1.save()
+>>> addr2.save()
+>>> jkr = Author.objects.get(first_name="J.K.")
+>>> jkr.address
+>>> jkr.address = addr1
+>>> jkr.save()
+>>> jkr.address
+<Address: Address object (1)>
+>>> jkr.address.street
+'Some Street'
+
+```
+
+## Many to Many Relationship
+
+```shell
+>> spain = Country(name="Spain", code="ES")
+>>> spain.save()
+>>> mys.published_countries.add(spain)
+>>> mys.published_countries.filter(code="ES")
+<QuerySet [<Country: Country object (1)>]>
+>>> Country.objects.all()
+<QuerySet [<Country: Country object (1)>]>
+>>>
+
+```
